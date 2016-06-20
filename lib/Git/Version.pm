@@ -38,9 +38,11 @@ my %cached = (
 );
 
 sub normalize (Str $v is copy) {
-    $v ~~ s:g/^v|^git' 'version' '|\.msysgit.*//;
-    $v ~~ tr/-/./;
-    $v ~~ s/0rc/0.rc/;
+    given $v {
+        s:g/^v|^git' 'version' '|\.msysgit.*//;
+        tr/-/./;
+        s/0rc/0.rc/;
+    }
     return %cached{$v} if %cached{$v}:exists;
 
     # compute the version four parts
@@ -60,10 +62,7 @@ sub normalize (Str $v is copy) {
     }
 
     # rc
-    if @v[*-1].substr(0,2) eq 'rc' {
-        @v[*-1] ~~ s/rc//;
-        @r = ( -1, @v.pop );
-    }
+    @r = ( -1, @v.pop ) if @v[*-1] ~~ s/^rc//;
     @v.push( 0 ) xx 4-@v;
     @v.append( @r );
     @v.push( $c );
