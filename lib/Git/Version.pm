@@ -63,9 +63,7 @@ sub normalize (Str $v is copy) {
 
     # rc
     @r = ( -1, @v.pop ) if @v[*-1] ~~ s/^rc//;
-    @v.push( 0 ) xx 4-@v;
-    @v.append( @r );
-    @v.push( $c );
+    @v.append: flat 0 xx 4-@v,  @r, $c;
     @v = @v».Int;
 
     return %cached{$v} = @v;
